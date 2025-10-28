@@ -64,7 +64,7 @@ namespace Adventure_Game
                     feedback.Text = GetHint(diff); // Correct guess
                     ding.Play();
                     skillComplete = true;
-                    if (guessCount <= 7) { skillSuccess = true; }
+                    if (guessCount <= 7) skillSuccess = true; ;
                     
                     resetButton.Visible = true;
                 }
