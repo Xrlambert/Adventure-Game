@@ -118,13 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="nopeSfx" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\..\Guessing Game\Guessing Game\Properties\..\Resources\nopeSfx.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="dingSfx" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\..\Guessing Game\Guessing Game\Properties\..\Resources\ding-402325.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="errorSfx" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\..\Guessing Game\Guessing Game\Properties\..\Resources\errorSfx.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\ding-402325.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

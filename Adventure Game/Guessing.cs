@@ -34,9 +34,9 @@ namespace Adventure_Game
         {
             testDisp.Text = secretNumber.ToString(); // Display secret number (for testing)
 
-            SoundPlayer error = new SoundPlayer(Properties.Resources.errorSfx);
+            
             SoundPlayer ding = new SoundPlayer(Properties.Resources.dingSfx);
-            SoundPlayer nope = new SoundPlayer(Properties.Resources.nopeSfx);
+            
 
             if (GuessBox.Text.Contains("dev")) testDisp.Visible = !testDisp.Visible; // Dev mode toggle
 
@@ -54,12 +54,10 @@ namespace Adventure_Game
                 if (diff < 0)
                 {
                     feedback.Text = GetHint(diff) + ", Too High!";
-                    nope.Play();
                 }
                 else if (diff > 0)
                 {
                     feedback.Text = GetHint(diff) + ", Too Low";
-                    nope.Play();
                 }
                 else
                 {
@@ -76,7 +74,6 @@ namespace Adventure_Game
                 // Handle invalid input
                 feedback.ForeColor = Color.Red;
                 feedback.Text = "Invalid Input";
-                error.Play();
                 await Task.Delay(1200);
                 feedback.Text = "";
                 feedback.ForeColor = Color.White;
@@ -108,5 +105,10 @@ namespace Adventure_Game
         }
 
         private void countBox_Click(object sender, EventArgs e) { }
+
+        private void Guessing_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
