@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -7,12 +6,17 @@ namespace Adventure_Game
 {
     public partial class Form1 : Form
     {
-        // Private fields (use leading underscore convention)
+        // Tracks the current page of the story
         private int _currentPage = 1;
+
+        // Random generator for fallback outcomes and chance-based events
         private readonly Random _rng = new Random();
+
+        // Prevents user interaction during transitions or pauses
         private bool _isWaitingForPause = false;
 
-        // Simple Player model (expand as needed)
+        private bool _restarting = false;
+        // Represents the player's state throughout the game
         private class Player
         {
             public string Name = "Player";
@@ -24,91 +28,160 @@ namespace Adventure_Game
             public bool SurvivorFound = false;
         }
 
+        // Active player instance
         private Player _player = new Player();
 
         public Form1()
         {
             InitializeComponent();
-            UpdateStatusLabel();
-            DisplayPage();
+            UpdateStatusLabel();  // Show initial stats
+            DisplayPage();        // Render first page
         }
 
+        // Handles Option 1 button click based on current page
         private void btnOption1_Click(object sender, EventArgs e)
         {
             if (_isWaitingForPause) return;
-            // Example routing pattern: check page and apply effects
-            if (_currentPage == 1)
+
+            switch (_currentPage)
             {
-                // Page 1: Continue / ask name example
-                string name = PromptForName();
-                if (!string.IsNullOrWhiteSpace(name)) _player.Name = name;
-                _currentPage = 2;
+                case 1:
+                    // Ask for player name
+                    string name = PromptForName();
+                    if (!string.IsNullOrWhiteSpace(name)) _player.Name = name;
+                    _currentPage = 2;
+                    break;
+
+                case 2:
+                    // Divert power to Life Support
+                    _player.Power -= 5;
+                    _player.TimeRemaining += 1;
+                    _currentPage = 3;
+                    break;
+
+                case 3:
+                    // Investigate corridor sound
+                    _currentPage = 6;
+                    break;
+
+                case 4:
+                    // Activate AI
+                    _player.TrustAI = true;
+                    _player.Morality += 1;
+                    _player.TimeRemaining -= 1;
+                    _currentPage = 5;
+                    break;
+
+                case 5:
+                    // Search cryo pods (70% success)
+                    if (_rng.Next(100) < 70)
+                    {
+                        _player.SurvivorFound = true;
+                        _player.Morality += 1;
+                    }
+                    _player.TimeRemaining -= 1;
+                    _currentPage = 10;
+                    break;
+
+                case 6:
+                    // Launch Guessing Game challenge
+                    OpenGuessingChallenge();
+                    break;
+
+                default:
+                    _currentPage++;
+                    break;
             }
-            else if (_currentPage == 2)
+            if (_restarting)
             {
-                // Example: Page 2 option 1 (Life Support)
-                _player.Power -= 5;
-                _player.TimeRemaining += 1;
-                _currentPage = 3;
-            }
-            else
-            {
-                // Default forward
-                _currentPage++;
+                _player = new Player();
+                _currentPage = 1;
+                _isWaitingForPause = false;
+                UpdateStatusLabel();
+                DisplayPage();
+                _restarting= false;
             }
 
             UpdateStatusLabel();
             DisplayPage();
         }
 
+        // Handles Option 2 button click based on current page
         private void btnOption2_Click(object sender, EventArgs e)
         {
             if (_isWaitingForPause) return;
-            if (_currentPage == 2)
+
+            switch (_currentPage)
             {
-                // Example: Page 2 option 2 (Communications)
-                _player.Power -= 5;
-                _player.Knowledge += 1;
-                _currentPage = 4;
-            }
-            else
-            {
-                _currentPage++;
+                case 2:
+                    // Divert power to Communications
+                    _player.Power -= 5;
+                    _player.Knowledge += 1;
+                    _currentPage = 4;
+                    break;
+
+                case 3:
+                    // Return to control room
+                    _currentPage = 7;
+                    break;
+
+                case 4:
+                    // Leave AI offline
+                    _player.Morality -= 1;
+                    _player.TimeRemaining -= 1;
+                    _currentPage = 5;
+                    break;
+
+                case 5:
+                    // Access security logs
+                    _player.Knowledge += 1;
+                    _player.TimeRemaining -= 1;
+                    _currentPage = 10;
+                    break;
+
+                default:
+                    _currentPage++;
+                    break;
             }
 
             UpdateStatusLabel();
             DisplayPage();
         }
 
+        // Handles Option 3 button click (used on pages with 3 choices)
         private void btnOption3_Click(object sender, EventArgs e)
         {
             if (_isWaitingForPause) return;
-            if (_currentPage == 2)
+
+            switch (_currentPage)
             {
-                // Example: Page 2 option 3 (Data Core)
-                _player.Power -= 8;
-                _player.Knowledge += 2;
-                _currentPage = 5;
-            }
-            else if (_currentPage == 6)
-            {
-                // Example: page 6 option 3 (Stay and finish research)
-                _player.Morality += 2;
-                _player.TimeRemaining -= 1;
-                _currentPage = 9;
-            }
-            else
-            {
-                _currentPage++;
+                case 2:
+                    // Divert power to Data Core
+                    _player.Power -= 8;
+                    _player.Knowledge += 2;
+                    _player.TimeRemaining -= 1;
+                    _currentPage = 3;
+                    break;
+
+                default:
+                    _currentPage++;
+                    break;
             }
 
             UpdateStatusLabel();
             DisplayPage();
         }
+        // Handles the button click to open the guessing challenge form
+        private void btnOpenGuessingForm_Click(object sender, EventArgs e)
+        {
+            if (_isWaitingForPause) return;
+            OpenGuessingChallenge(); // This method handles the guessing logic
+        }
 
+
+        // Resets game state to initial values
         private void btnRestart_Click(object sender, EventArgs e)
         {
-            // Reset player and page
             _player = new Player();
             _currentPage = 1;
             _isWaitingForPause = false;
@@ -116,36 +189,34 @@ namespace Adventure_Game
             DisplayPage();
         }
 
-        private void btnOpenGuessingForm_Click(object sender, EventArgs e)
+        // Launches the guessing challenge form or fallback logic
+        private void OpenGuessingChallenge()
         {
-            if (_isWaitingForPause) return;
-            // Open guessing form modal (assumes you have a GuessingForm in the project)
             try
             {
-                using (var gue = new Guessing()) // if doesn't exist, create a simple one or remove this block
+                using (var guessForm = new Guessing())
                 {
-                    var result = gue.ShowDialog(this);
+                    var result = guessForm.ShowDialog(this);
                     if (result == DialogResult.OK)
                     {
-                        bool complete = gue.skillComplete; // guessing form should expose a Success property
-                        if (complete && gue.skillSuccess)
+                        if (guessForm.skillComplete && guessForm.skillSuccess)
                         {
-                            // handle success branch
+                            // Success: boost knowledge and progress
                             _player.Knowledge += 2;
                             _currentPage++;
                         }
                         else
                         {
-                            // handle failure branch
+                            // Failure: lose time and skip ahead
                             _player.TimeRemaining -= 1;
                             _currentPage += 2;
                         }
                     }
                 }
             }
-            catch (Exception)
+            catch
             {
-                // If GuessingForm isn't available, fallback: run a random check
+                // Fallback random outcome if form fails
                 if (_rng.Next(100) < 70)
                 {
                     _player.Knowledge += 1;
@@ -162,7 +233,7 @@ namespace Adventure_Game
             DisplayPage();
         }
 
-        // Helper to prompt for name (simple dialog)
+        // Prompts user to enter their name
         private string PromptForName()
         {
             string input = null;
@@ -186,77 +257,95 @@ namespace Adventure_Game
             return input;
         }
 
-        // Update the status label (lblStatus exists in Designer)
+        // Updates status labels with current player stats and page number
         private void UpdateStatusLabel()
         {
-            try
-            {
-                lblStatus.Text = $"Power: {_player.Power}   Time: {_player.TimeRemaining}   Morality: {_player.Morality}   Knowledge: {_player.Knowledge}";
-            }
-            catch
-            {
-                // If lblStatus is missing in Designer, try to set a control named returnLabel (backwards compatibility)
-                var f = this.GetType().GetField("returnLabel", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-                if (f != null)
-                {
-                    var obj = f.GetValue(this) as Label;
-                    if (obj != null) obj.Text = $"Power: {_player.Power}   Time: {_player.TimeRemaining}   Morality: {_player.Morality}   Knowledge: {_player.Knowledge}";
-                }
-            }
+            lblStatus.Text = $"Power: {_player.Power}   Time: {_player.TimeRemaining}   Morality: {_player.Morality}   Knowledge: {_player.Knowledge}";
 
-            // Also update page number label if present
-            if (this.Controls != null)
-            {
-                var lbl = this.Controls["lblPageNumber"] as Label;
-                if (lbl != null) lbl.Text = $"Page: {_currentPage}";
-            }
+            var lblPage = this.Controls["lblPageNumber"] as Label;
+            if (lblPage != null) lblPage.Text = $"Page: {_currentPage}";
         }
 
-        // DisplayPage skeleton — expand each case with full narrative, images, audio, pauses, random outcomes
+        // Renders the current page's narrative and options
         private async void DisplayPage()
         {
-            // Prevent input during rendering/pause
             _isWaitingForPause = true;
-            // Basic reset of buttons
-            btnOption1.Enabled = false;
-            btnOption2.Enabled = false;
-            btnOption3.Enabled = false;
 
-            // Simple example of page rendering logic
+            // Reset button visibility
+            btnOption1.Visible = btnOption2.Visible = btnOption3.Visible = false;
+            btnOption1.Enabled = btnOption2.Enabled = btnOption3.Enabled = false;
+
             switch (_currentPage)
             {
                 case 1:
                     lblNarrative.Text = "You wake up aboard the Aurora. You are alone. Click Continue.";
                     btnOption1.Text = "Continue";
-                    btnOption1.Visible = true;
-                    btnOption1.Enabled = true;
-                    btnOption2.Visible = false;
-                    btnOption3.Visible = false;
+                    btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
                 case 2:
                     lblNarrative.Text = "Power allocation: choose where to divert power.";
                     btnOption1.Text = "Life Support";
-                    btnOption1.Visible = true;
-                    btnOption1.Enabled = true;
                     btnOption2.Text = "Communications";
-                    btnOption2.Visible = true;
-                    btnOption2.Enabled = true;
                     btnOption3.Text = "Data Core";
-                    btnOption3.Visible = true;
-                    btnOption3.Enabled = true;
+                    btnOption1.Visible = btnOption2.Visible = btnOption3.Visible = true;
+                    btnOption1.Enabled = btnOption2.Enabled = btnOption3.Enabled = true;
                     break;
 
                 case 3:
-                    // Example pause scene: show partial text then reveal more
                     lblNarrative.Text = "You move down the corridor. It is quiet...";
                     await Task.Delay(1000);
-                    lblNarrative.Text += "\nA faint click echoes from the data core.";
+                    lblNarrative.Text += "\nA strange sound echoes from the data core.";
                     btnOption1.Text = "Investigate";
+                    btnOption2.Text = "Return to control room";
+                    btnOption1.Visible = btnOption2.Visible = true;
+                    btnOption1.Enabled = btnOption2.Enabled = true;
+                    break;
+
+                case 4:
+                    lblNarrative.Text = "You find the AI terminal. Do you want to activate it?";
+                    btnOption1.Text = "Activate AI";
+                    btnOption2.Text = "Leave it offline";
+                    btnOption1.Visible = btnOption2.Visible = true;
+                    btnOption1.Enabled = btnOption2.Enabled = true;
+                    break;
+
+                case 5:
+                    lblNarrative.Text = "You approach the cryo pods. What will you do?";
+                    btnOption1.Text = "Search pods";
+                    btnOption2.Text = "Access security logs";
+                    btnOption1.Visible = btnOption2.Visible = true;
+                    btnOption1.Enabled = btnOption2.Enabled = true;
+                    break;
+
+                case 6:
+                    lblNarrative.Text = "You reach a terminal with encrypted data. You must verify the signal.";
+                    await Task.Delay(1000);
+                    lblNarrative.Text += "\nInitiating verification challenge...";
+                    btnOption1.Text = "Begin Challenge";
                     btnOption1.Visible = true;
                     btnOption1.Enabled = true;
-                    btnOption2.Visible = false;
-                    btnOption3.Visible = false;
+                    break;
+
+                case 7:
+                    lblNarrative.Text = "You return to the control room. Systems are still unstable.";
+                    btnOption1.Text = "Try to stabilize power";
+                    btnOption1.Visible = true;
+                    btnOption1.Enabled = true;
+                    break;
+
+                case 8:
+                    lblNarrative.Text = "AI is now online. It begins analyzing the station's condition.";
+                    btnOption1.Text = "Continue";
+                    btnOption1.Visible = true;
+                    btnOption1.Enabled = true;
+                    break;
+
+                case 10:
+                    lblNarrative.Text = "You’ve completed the signal verification. What’s next?";
+                    btnOption1.Text = "Proceed to final decision";
+                    btnOption1.Visible = true;
+                    btnOption1.Enabled = true;
                     break;
 
                 default:
@@ -264,8 +353,7 @@ namespace Adventure_Game
                     btnOption1.Text = "Restart";
                     btnOption1.Visible = true;
                     btnOption1.Enabled = true;
-                    btnOption2.Visible = false;
-                    btnOption3.Visible = false;
+                    _restarting = true;
                     break;
             }
 

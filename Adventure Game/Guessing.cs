@@ -22,6 +22,7 @@ namespace Adventure_Game
         public bool skillSuccess { get; private set; } = false;
         public int GuessAttempts => guessCount;
 
+        
         public Guessing()
         {
             InitializeComponent();
@@ -109,6 +110,11 @@ namespace Adventure_Game
         private void Guessing_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void Guessing_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!skillComplete) e.Cancel = true; // Prevent closing if skill not complete
         }
     }
 }
