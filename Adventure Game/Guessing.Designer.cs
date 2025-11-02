@@ -38,6 +38,7 @@
             this.resetButton = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.countBox = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -45,11 +46,11 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(65, 41);
+            this.label1.Location = new System.Drawing.Point(108, 41);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(248, 37);
+            this.label1.Size = new System.Drawing.Size(176, 37);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Guessing Game";
+            this.label1.Text = "Verification";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label2
@@ -154,12 +155,26 @@
             this.countBox.Visible = false;
             this.countBox.Click += new System.EventHandler(this.countBox_Click);
             // 
+            // button1
+            // 
+            this.button1.BackColor = System.Drawing.Color.Black;
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.ForeColor = System.Drawing.Color.White;
+            this.button1.Location = new System.Drawing.Point(155, 304);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(77, 29);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "Give Up";
+            this.button1.UseVisualStyleBackColor = false;
+            this.button1.Visible = false;
+            // 
             // Guessing
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(388, 360);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.countBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.resetButton);
@@ -191,6 +206,7 @@
         private System.Windows.Forms.Button resetButton;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label countBox;
+        private System.Windows.Forms.Button button1;
     }
 }
 

@@ -50,6 +50,15 @@ namespace Adventure_Game
                 countBox.Text = "Guess #:" + guessCount;
                 countBox.Visible = true;
                 feedback.Visible = true;
+                if (guessCount > 10)
+                {
+                    feedback.ForeColor = Color.Red;
+                    feedback.Text = "Too Many Attempts! You Failed!";
+                    resetButton.Visible = true;
+                    skillComplete = true;
+                    skillSuccess = false;
+                    return;
+                }
 
                 // Provide feedback based on guess direction
                 if (diff < 0)

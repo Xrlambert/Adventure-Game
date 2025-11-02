@@ -36,7 +36,6 @@ namespace Adventure_Game
 
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.lblTitle = new System.Windows.Forms.Label();
             this.picPageImage = new System.Windows.Forms.PictureBox();
             this.lblNarrative = new System.Windows.Forms.Label();
@@ -47,12 +46,12 @@ namespace Adventure_Game
             this.lblStatus = new System.Windows.Forms.Label();
             this.lblPageNumber = new System.Windows.Forms.Label();
             this.btnOpenGuessingForm = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picPageImage)).BeginInit();
             this.SuspendLayout();
             // 
             // lblTitle
             // 
-            this.lblTitle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
             this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
             this.lblTitle.Location = new System.Drawing.Point(18, 12);
             this.lblTitle.Name = "lblTitle";
@@ -63,8 +62,8 @@ namespace Adventure_Game
             // 
             // picPageImage
             // 
-            this.picPageImage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.picPageImage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.picPageImage.BackColor = System.Drawing.SystemColors.ControlDark;
             this.picPageImage.Location = new System.Drawing.Point(520, 64);
             this.picPageImage.Name = "picPageImage";
@@ -75,8 +74,8 @@ namespace Adventure_Game
             // 
             // lblNarrative
             // 
-            this.lblNarrative.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblNarrative.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lblNarrative.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.lblNarrative.Location = new System.Drawing.Point(18, 64);
             this.lblNarrative.Name = "lblNarrative";
@@ -134,8 +133,8 @@ namespace Adventure_Game
             // 
             // lblStatus
             // 
-            this.lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lblStatus.Font = new System.Drawing.Font("Consolas", 9F);
             this.lblStatus.Location = new System.Drawing.Point(18, 470);
             this.lblStatus.Name = "lblStatus";
@@ -166,9 +165,22 @@ namespace Adventure_Game
             this.btnOpenGuessingForm.UseVisualStyleBackColor = true;
             this.btnOpenGuessingForm.Click += new System.EventHandler(this.btnOpenGuessingForm_Click);
             // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.button1.Location = new System.Drawing.Point(620, 476);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(104, 28);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "Back(TST)";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(864, 516);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btnOpenGuessingForm);
             this.Controls.Add(this.lblPageNumber);
             this.Controls.Add(this.lblStatus);
@@ -188,5 +200,7 @@ namespace Adventure_Game
         }
 
         #endregion
+
+        private System.Windows.Forms.Button button1;
     }
 }

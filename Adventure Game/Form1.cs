@@ -281,7 +281,7 @@ namespace Adventure_Game
                 pageLbl.Text = $"Page: {_currentPage}";
         }
 
-        // --- DisplayPage method ----------------------------------------------------
+        // --- DisplayPage method -----------------------------------------------------
         private async void DisplayPage()
         {
             _isWaitingForPause = true;
@@ -302,9 +302,9 @@ namespace Adventure_Game
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
-                // Page 2: Power allocation choices - three visible option buttons:
-                //   Option1 = Life Support (costs power, adds time)
-                //   Option2 = Communications (costs power, gains knowledge)
+                // Page 2: Power allocation — three option buttons:
+                //   Option1 = Life Support (spend power, gain time)
+                //   Option2 = Communications (spend power, gain knowledge)
                 //   Option3 = Data Core (higher power cost, higher knowledge gain)
                 case 2:
                     lblNarrative.Text = "Low Power Warning: choose where to divert power.";
@@ -315,8 +315,10 @@ namespace Adventure_Game
                     btnOption1.Enabled = btnOption2.Enabled = btnOption3.Enabled = true;
                     break;
 
-                // Page 3: Corridor investigation - single "Investigate" button that continues the story
-                case 3:
+                    // Page 3: Corridor choices — two option buttons:
+                    //   Option1 = Investigate (follow the sound to the challenge)
+                    //   Option2 = Return to control room (go back to the hub)
+                 case 3:
                     lblNarrative.Text = "You move down the corridor. It is quiet...";
                     await Task.Delay(900);
                     lblNarrative.Text += "\nA strange sound echoes from the data core.";
@@ -327,6 +329,19 @@ namespace Adventure_Game
                     break;
 
                 case 4:
+                    lblNarrative.Text = "You move down the corridor. An alarm is sounding...";
+                    await Task.Delay(900);
+                    lblNarrative.Text += "\nA hail sounds from the console";
+                    btnOption1.Text = "Respond (70% Chance)";
+                    btnOption2.Text = "Ignore";
+                    btnOption1.Visible = true;
+                    btnOption2.Visible = true;
+                    break;
+
+                    // Page 5: AI terminal — two option buttons:
+                    //   Option1 = Activate AI (toggle trust, adjust morality/time)
+                    //   Option2 = Leave it offline (decline activation, preserve status)
+                case 5:
                     lblNarrative.Text = "You find the AI terminal. Do you want to activate it?";
                     btnOption1.Text = "Activate AI";
                     btnOption2.Text = "Leave it offline";
@@ -334,7 +349,10 @@ namespace Adventure_Game
                     btnOption1.Enabled = btnOption2.Enabled = true;
                     break;
 
-                case 5:
+                // Page 6: Cryo pods — two option buttons:
+                //   Option1 = Search pods (chance to find survivor, costs time)
+                //   Option2 = Access security logs (gain information, costs time)
+                case 6:
                     lblNarrative.Text = "You approach the cryo pods. What will you do?";
                     btnOption1.Text = "Search pods";
                     btnOption2.Text = "Access security logs";
@@ -342,7 +360,9 @@ namespace Adventure_Game
                     btnOption1.Enabled = btnOption2.Enabled = true;
                     break;
 
-                case 6:
+                // Page 7: Verification challenge entry — two controls:
+                //   Option1 = Begin Challenge (open guessing modal to resolve signal)
+                case 7:
                     lblNarrative.Text = "You reach a terminal with encrypted data. You must verify the signal.";
                     await Task.Delay(700);
                     lblNarrative.Text += "\nInitiating verification challenge...";
@@ -355,26 +375,26 @@ namespace Adventure_Game
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
-                case 7:
+                case 8:
                     lblNarrative.Text = "You return to the control room. Systems are still unstable.";
                     btnOption1.Text = "Try to stabilize power";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
-                case 8:
+                case 9:
                     lblNarrative.Text = "AI is now online. It begins analyzing the station's condition.";
                     btnOption1.Text = "Continue";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
-                case 9:
+                case 10:
                     lblNarrative.Text = "You continue your research and gain insight.";
                     btnOption1.Text = "Continue";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
-                case 10:
-                    lblNarrative.Text = "You’ve completed the signal verification. What’s next?";
+                case 11:
+                    lblNarrative.Text = "Task Successful. What’s next?";
                     btnOption1.Text = "Proceed to final decision";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
@@ -389,6 +409,13 @@ namespace Adventure_Game
 
             UpdateStatusLabel();
             _isWaitingForPause = false;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            _currentPage--;
+            UpdateStatusLabel();
+            DisplayPage();
         }
     }
 }
