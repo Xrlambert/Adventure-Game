@@ -185,34 +185,27 @@ namespace Adventure_Game
         {
             if (_isWaitingForPause) return;
 
-            try
-            {
-                using (var gue = new Guessing())
-                {
+            try {
+                using (var gue = new Guessing()) {
+                    
                     var result = gue.ShowDialog(this);
 
-                    if (result == DialogResult.OK || gue.skillComplete)
-                    {
-                        if (gue.skillSuccess)
-                        {
+                    if (result == DialogResult.OK || gue.skillComplete) {
+                        if (gue.skillSuccess) { 
                             _player.Knowledge += 2;
                             _currentPage++;
                         }
-                        else
-                        {
+                        else {
                             _player.TimeRemaining -= 1;
                             _currentPage += 2;
                         }
                     }
-                    else
-                    {
-                        if (_rng.Next(100) < 70)
-                        {
+                    else {
+                        if (_rng.Next(100) < 70) {
                             _player.Knowledge += 1;
                             _currentPage++;
                         }
-                        else
-                        {
+                        else {
                             _player.TimeRemaining -= 1;
                             _currentPage += 2;
                         }
@@ -309,8 +302,12 @@ namespace Adventure_Game
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
+                // Page 2: Power allocation choices - three visible option buttons:
+                //   Option1 = Life Support (costs power, adds time)
+                //   Option2 = Communications (costs power, gains knowledge)
+                //   Option3 = Data Core (higher power cost, higher knowledge gain)
                 case 2:
-                    lblNarrative.Text = "Power allocation: choose where to divert power.";
+                    lblNarrative.Text = "Low Power Warning: choose where to divert power.";
                     btnOption1.Text = "Life Support";
                     btnOption2.Text = "Communications";
                     btnOption3.Text = "Data Core";
@@ -318,6 +315,7 @@ namespace Adventure_Game
                     btnOption1.Enabled = btnOption2.Enabled = btnOption3.Enabled = true;
                     break;
 
+                // Page 3: Corridor investigation - single "Investigate" button that continues the story
                 case 3:
                     lblNarrative.Text = "You move down the corridor. It is quiet...";
                     await Task.Delay(900);
