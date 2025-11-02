@@ -48,9 +48,9 @@
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Location = new System.Drawing.Point(108, 41);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(176, 37);
+            this.label1.Size = new System.Drawing.Size(128, 37);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Verification";
+            this.label1.Text = "Attempt";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label2
@@ -105,7 +105,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(259, 23);
             this.label4.TabIndex = 5;
-            this.label4.Text = "Please Enter A Number";
+            this.label4.Text = "Success is under 7 guesses";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label4.Visible = false;
             // 
