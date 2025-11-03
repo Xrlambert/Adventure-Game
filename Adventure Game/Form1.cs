@@ -112,7 +112,7 @@ namespace Adventure_Game
 
                 // Page 9: Begin Challenge -> open guessing form (returns early)
                 case 9:
-                    OpenGuessingChallenge(); 
+                    OpenGuessingChallenge();
                     return;
 
                 // Page 10: Try to stabilize power -> effect and continue to AI online page (page 10)
@@ -139,7 +139,7 @@ namespace Adventure_Game
 
                 // Page 14: Continue -> advance to after 3 choices
                 case 14:
-                                        _currentPage = 6;
+                    _currentPage = 6;
                     break;
                 // Default: advance
                 default:
@@ -251,27 +251,35 @@ namespace Adventure_Game
         {
             if (_isWaitingForPause) return;
 
-            try {
-                using (var gue = new Guessing()) {
-                    
+            try
+            {
+                using (var gue = new Guessing())
+                {
+
                     var result = gue.ShowDialog(this);
 
-                    if (result == DialogResult.OK || gue.skillComplete) {
-                        if (gue.skillSuccess) { 
+                    if (result == DialogResult.OK || gue.skillComplete)
+                    {
+                        if (gue.skillSuccess)
+                        {
                             _player.Knowledge += 2;
                             _currentPage++;
                         }
-                        else {
+                        else
+                        {
                             _player.TimeRemaining -= 1;
                             _currentPage += 2;
                         }
                     }
-                    else {
-                        if (_rng.Next(100) < 70) {
+                    else
+                    {
+                        if (_rng.Next(100) < 70)
+                        {
                             _player.Knowledge += 1;
                             _currentPage++;
                         }
-                        else {
+                        else
+                        {
                             _player.TimeRemaining -= 1;
                             _currentPage += 2;
                         }
@@ -394,9 +402,9 @@ namespace Adventure_Game
                     btnOption1.Enabled = btnOption2.Enabled = true;
                     break;
 
-                    // Page 4: Incoming hail — two option buttons:                      (CONSOLE HAIL DECISION)
-                    //   Option1 = Respond (accept contact; increases TrustAI/morality, costs time)
-                    //   Option2 = Ignore  (decline contact; decreases morality, costs time)
+                // Page 4: Incoming hail — two option buttons:                      (CONSOLE HAIL DECISION)
+                //   Option1 = Respond (accept contact; increases TrustAI/morality, costs time)
+                //   Option2 = Ignore  (decline contact; decreases morality, costs time)
                 case 4:
                     lblNarrative.Text = "You move down the corridor. An alarm is sounding...";
                     await Task.Delay(900);
