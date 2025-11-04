@@ -36,6 +36,7 @@ namespace Adventure_Game
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.lblTitle = new System.Windows.Forms.Label();
             this.picPageImage = new System.Windows.Forms.PictureBox();
             this.lblNarrative = new System.Windows.Forms.Label();
@@ -48,7 +49,9 @@ namespace Adventure_Game
             this.btnOpenGuessingForm = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.MXB = new AxWMPLib.AxWindowsMediaPlayer();
             ((System.ComponentModel.ISupportInitialize)(this.picPageImage)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MXB)).BeginInit();
             this.SuspendLayout();
             // 
             // lblTitle
@@ -190,9 +193,19 @@ namespace Adventure_Game
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // MXB
+            // 
+            this.MXB.Enabled = true;
+            this.MXB.Location = new System.Drawing.Point(294, 222);
+            this.MXB.Name = "MXB";
+            this.MXB.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("MXB.OcxState")));
+            this.MXB.Size = new System.Drawing.Size(194, 47);
+            this.MXB.TabIndex = 12;
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(864, 516);
+            this.Controls.Add(this.MXB);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnOpenGuessingForm);
@@ -205,10 +218,12 @@ namespace Adventure_Game
             this.Controls.Add(this.lblNarrative);
             this.Controls.Add(this.picPageImage);
             this.Controls.Add(this.lblTitle);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(880, 555);
             this.Name = "Form1";
             this.Text = "Adventure Game";
             ((System.ComponentModel.ISupportInitialize)(this.picPageImage)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MXB)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -217,5 +232,6 @@ namespace Adventure_Game
 
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private AxWMPLib.AxWindowsMediaPlayer MXB;
     }
 }

@@ -16,6 +16,7 @@ namespace Adventure_Game
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            //Sound.StartBackgroundLoop();
             Application.Run(new Form1());
         }
     }

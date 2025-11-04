@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Media;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
 
 namespace Adventure_Game
 {
@@ -11,6 +13,7 @@ namespace Adventure_Game
         private readonly Random _rng = new Random();
         private bool _isWaitingForPause = false;
         private bool _restarting = false;
+        public bool _AIdone = false;
 
         // --- Simple player model ----------------------------------------------------
         private class Player
@@ -24,6 +27,7 @@ namespace Adventure_Game
             public bool SurvivorFound = false;
         }
 
+        
         // Active player instance
         private Player _player = new Player();
 
@@ -33,13 +37,25 @@ namespace Adventure_Game
             InitializeComponent();
             UpdateStatusLabel();  // Shows initial player stats
             DisplayPage();        // Loads the first scene
+            this.Shown += Form1_Load;
+
+            MXB.URL = @"slow-down-244244";
+            MXB.settings.playCount = 9999;
+            MXB.Ctlcontrols.stop();
+            MXB.Visible = true;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            //Sound.Starty
         }
 
         // --- Option 1 handler ------------------------------------------------------
-        private void btnOption1_Click(object sender, EventArgs e)
+        private async void btnOption1_Click(object sender, EventArgs e)
         {
             if (_isWaitingForPause) return;
 
+            //Sound.();
             // If we're on the Restart prompt, Option1 restarts the game
             if (_restarting)
             {
@@ -68,7 +84,7 @@ namespace Adventure_Game
                     _currentPage = 3;
                     break;
 
-                // Page 3: Investigate -> go to verification challenge (page 8)
+                // Page 3: Investigate sound -> see own empty pod (page 15)
                 case 3:
                     _currentPage = 8;
                     break;
@@ -83,7 +99,7 @@ namespace Adventure_Game
 
                 // Page 5: Attempt Repair via skill game (opens modal, return early)
                 case 5:
-                    OpenGuessingChallenge(); // opens form; callback handles result and navigation                                                            ***********Needs to open Guessing form***********
+                    await OpenGuessingChallenge(); // opens form; callback handles result and navigation                                                            ***********Needs to open Guessing form***********
                     return;
 
                 // Page 6: Corridor advance for AI
@@ -112,14 +128,14 @@ namespace Adventure_Game
 
                 // Page 9: Begin Challenge -> open guessing form (returns early)
                 case 9:
-                    OpenGuessingChallenge();
+                    await OpenGuessingChallenge();
                     return;
 
                 // Page 10: Try to stabilize power -> effect and continue to AI online page (page 10)
                 case 10:
                     _player.Power += 5;
                     _player.TimeRemaining -= 1;
-                    _currentPage = 10;
+                    _currentPage = 11;
                     break;
 
                 // Page 11: Continue -> page 11
@@ -132,14 +148,19 @@ namespace Adventure_Game
                     _currentPage = 12;
                     break;
 
-                // Page 13: Proceed to final decision -> advance to end/default
+                // Page 13: Return to control room -> go to page 2
                 case 13:
-                    _currentPage++;
+                    _currentPage = 2;
                     break;
 
                 // Page 14: Continue -> advance to after 3 choices
                 case 14:
                     _currentPage = 6;
+                    break;
+
+                // Page 15: Continue searching -> see data stick (page 16)
+                case 15:
+                    _currentPage = 16;
                     break;
                 // Default: advance
                 default:
@@ -157,6 +178,7 @@ namespace Adventure_Game
         {
             if (_isWaitingForPause) return;
 
+            //Sound.PlayClick();
             //cases for all pages where button 2 is relevant
             switch (_currentPage)
             {
@@ -179,9 +201,9 @@ namespace Adventure_Game
                     _currentPage = 6;
                     break;
 
-                // Page 5: Return to corridor (from Data Core result)
+                // Page 5: Return to control room
                 case 5:
-                    _currentPage = 3;
+                    _currentPage = 2;
                     break;
 
                 // Page 6: Leave AI offline -> preserve TrustAI=false and continue (page 10)
@@ -191,11 +213,12 @@ namespace Adventure_Game
                     _currentPage = 10;
                     break;
 
-                // Page 7: Access security logs -> gain knowledge, return to control room (page 9)
+                // Page 7: Return to control room 
                 case 7:
                     _player.Knowledge += 1;
                     _player.TimeRemaining -= 1;
-                    _currentPage = 9;
+                    _currentPage = 2;
+                    _AIdone = true;
                     break;
 
                 // Page 8: (no Option2 shown) fallthrough to default advance
@@ -213,7 +236,7 @@ namespace Adventure_Game
         private void btnOption3_Click(object sender, EventArgs e)
         {
             if (_isWaitingForPause) return;
-
+            //Sound.PlayClick();
             //cases for all pages where button 3 is relevant
             switch (_currentPage)
             {
@@ -247,7 +270,7 @@ namespace Adventure_Game
         }
 
         // --- Guessing Challenge ----------------------------------------------------
-        private void OpenGuessingChallenge()
+        private async Task OpenGuessingChallenge()
         {
             if (_isWaitingForPause) return;
 
@@ -263,11 +286,15 @@ namespace Adventure_Game
                         if (gue.skillSuccess)
                         {
                             _player.Knowledge += 2;
+                            lblNarrative.Text += "\nVerification Successful!";
+                            await Task.Delay(1200);
                             _currentPage++;
                         }
                         else
                         {
                             _player.TimeRemaining -= 1;
+                            lblNarrative.Text += "\nVerification Failed!";
+                            await Task.Delay(1200);
                             _currentPage += 2;
                         }
                     }
@@ -345,7 +372,7 @@ namespace Adventure_Game
         }
 
         // --- Status label update ---------------------------------------------------
-        private void UpdateStatusLabel()
+        private async void UpdateStatusLabel()
         {
             lblStatus.Text =
                 $"Power: {_player.Power}   Time: {_player.TimeRemaining}   Morality: {_player.Morality}   Knowledge: {_player.Knowledge}";
@@ -353,6 +380,10 @@ namespace Adventure_Game
             var pageLbl = this.Controls != null ? this.Controls["lblPageNumber"] as Label : null;
             if (pageLbl != null)
                 pageLbl.Text = $"Page: {_currentPage}";
+
+            lblStatus.ForeColor = System.Drawing.Color.Yellow;
+            await Task.Delay(500);
+            lblStatus.ForeColor = System.Drawing.Color.Black;
         }
 
         // --- DisplayPage method -----------------------------------------------------
@@ -423,7 +454,7 @@ namespace Adventure_Game
                     await Task.Delay(700);
                     lblNarrative.Text += "\nYou can attempt a manual verification/skill check to repair the systems.";
                     btnOption1.Text = "Attempt Repair (Skill)";
-                    btnOption2.Text = "Return to corridor";
+                    btnOption2.Text = "Return to control room";
                     btnOption1.Visible = btnOption2.Visible = true;
                     btnOption1.Enabled = btnOption2.Enabled = true;
                     break;
@@ -439,7 +470,7 @@ namespace Adventure_Game
                 //   Option1 = Activate AI (toggle trust, adjust morality/time)
                 //   Option2 = Leave it offline (decline activation, preserve status)
                 case 7:
-                    lblNarrative.Text = "You find the AI terminal. Do you want to activate it?";
+                    lblNarrative.Text = "You reach the AI terminal. Do you want to activate it?";
                     btnOption1.Text = "Activate AI";
                     btnOption2.Text = "Leave it offline";
                     btnOption1.Visible = btnOption2.Visible = true;
@@ -491,8 +522,9 @@ namespace Adventure_Game
                     break;
 
                 case 13:
-                    lblNarrative.Text = "Task Successful. What’s next?";
-                    btnOption1.Text = "Proceed to final decision";
+                    lblNarrative.Text = "Task Successful, the AI is managing the ship. What’s next?";
+                    btnOption1.Text = "Return to control room";
+                    btnOption2.Text = "Go to escape pods";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
@@ -500,7 +532,28 @@ namespace Adventure_Game
                     lblNarrative.Text = "Life Support restored.";
                     btnOption1.Text = "Continue";
                     btnOption1.Visible = btnOption1.Enabled = true;
+                    break;
 
+                case 15:
+                    lblNarrative.Text = "You find your own empty pod. The station is deserted.";
+                    btnOption1.Text = "Continue searching";
+                    btnOption2.Text = "Return to control room";
+                    btnOption1.Visible = btnOption2.Visible = true;
+                    btnOption1.Enabled = btnOption2.Enabled = true;
+                    break;
+
+                case 16:
+                    lblNarrative.Text = "You spot a data stick on the floor by an exit...";
+                    btnOption1.Text = "Continue";
+                    btnOption1.Visible = btnOption1.Enabled = true;
+                    break;
+
+                case 17:
+                    lblNarrative.Text = "You return to the control room, power is temporarily stable.";
+                    btnOption1.Text = "Continue";
+                    btnOption2.Text = "Check Data Core";
+                    btnOption1.Visible = btnOption2.Visible = true;
+                    btnOption1.Enabled = btnOption2.Enabled = true;
                     break;
                 default:
                     lblNarrative.Text = "End of demo path. Use Restart to try again.";
