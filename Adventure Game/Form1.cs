@@ -41,6 +41,10 @@ namespace Adventure_Game
 
         private System.Windows.Forms.Timer _gameTimer;
 
+        // Ending selector computed when reaching an ending
+        private int _endingType = 0; // 0 = default/lose, 1 = escape, 2 = AI, 3 = rescue
+
+
         // Active player instance
         private Player _player = new Player();
 
@@ -541,7 +545,7 @@ namespace Adventure_Game
                     lblNarrative.Text = "Low Power Warning: choose where to divert power.";
                     } else
                     {
-                        lblNarrative.Text = "Continue Exploration";
+                        lblNarrative.Text = "Console Room: Choose where to continue your exploration.";
                     }
                     // Button labels correspond to handlers' switch(case 2) mapping:
                     // btnOption1 triggers Life Support in btnOption1_Click
@@ -722,6 +726,15 @@ namespace Adventure_Game
                     await Task.Delay(900);
                     lblNarrative.Text += "\n Through the veiwport, you see a massive ship looming over you.";
                     btnOption1.Text = "Continue";
+                    break;
+
+                case 26:
+                    lblNarrative.Text = "You make your way to the escape pods";
+                    await Task.Delay(700);
+                    lblNarrative.Text = "\nYou ar confident there is nothing more you can do ot help the ship, and it is time to take your leave.";
+                    await Task.Delay(5000);
+                    _currentPage = 0;
+
                     break;
 
                 default:
