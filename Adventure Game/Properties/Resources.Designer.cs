@@ -86,5 +86,14 @@ namespace Adventure_Game.Properties {
                 return ResourceManager.GetStream("dingSfx", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        public static System.IO.UnmanagedMemoryStream ssss {
+            get {
+                return ResourceManager.GetStream("ssss", resourceCulture);
+            }
+        }
     }
 }

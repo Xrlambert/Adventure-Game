@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Media;
+using System.Threading.Tasks;
 
 namespace Adventure_Game
 {
@@ -13,18 +14,16 @@ namespace Adventure_Game
 
 
 
-        public void StartBackgroundLoop()
+        public async void StartBackgroundLoop()
         {
             backroundMusic = new SoundPlayer(Properties.Resources.back);
-            backroundMusic.PlayLooping();
-            backPlaying = true;
+            backroundMusic.Play();
         }
 
 
         public void ClickSf()
         {
-            click = new SoundPlayer(Properties.Resources.click);
-            click.Play();
+
         }
     }
 }

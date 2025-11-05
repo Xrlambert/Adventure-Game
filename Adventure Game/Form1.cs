@@ -13,14 +13,20 @@ namespace Adventure_Game
         private readonly Random _rng = new Random();
         private bool _isWaitingForPause = false;
         private bool _restarting = false;
-        public bool _AIdone = false;
 
-        // --- Simple player model ----------------------------------------------------
+
+        // --- Flags for key events ------------------------------------------------------
+        private bool _AIdone = false;
+        private bool _repairDone = false;
+        private bool _dataCoreAccessed = false;
+
+
+        // --- Simple player model ---------------------------------------------------- 
         private class Player
         {
             public string Name = "Player";
             public int Power = 100;
-            public int TimeRemaining = 7;
+            public int TimeRemaining = 60;
             public int Morality = 0;
             public int Knowledge = 0;
             public bool TrustAI = false;
@@ -37,12 +43,12 @@ namespace Adventure_Game
             InitializeComponent();
             UpdateStatusLabel();  // Shows initial player stats
             DisplayPage();        // Loads the first scene
-            this.Shown += Form1_Load;
+            //this.Shown += Form1_Load;
 
-            MXB.URL = @"slow-down-244244";
+            /*MXB.URL = @"slow-down-244244";
             MXB.settings.playCount = 9999;
             MXB.Ctlcontrols.stop();
-            MXB.Visible = true;
+            MXB.Visible = true;*/
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -80,7 +86,7 @@ namespace Adventure_Game
                 // Page 2: Life Support
                 case 2:
                     _player.Power -= 5;
-                    _player.TimeRemaining += 1;
+                    _player.TimeRemaining += 10;
                     _currentPage = 3;
                     break;
 
@@ -162,6 +168,17 @@ namespace Adventure_Game
                 case 15:
                     _currentPage = 16;
                     break;
+
+                // Page 16: Continue -> back to control room (page 17)
+                case 16:
+                    _currentPage = 17;
+                    break;
+
+                //page 17: Continue -> back to control room (page 2)
+                case 17:
+                    _currentPage = 2;
+                    break;
+
                 // Default: advance
                 default:
                     _currentPage++;
@@ -220,6 +237,8 @@ namespace Adventure_Game
                     _currentPage = 2;
                     _AIdone = true;
                     break;
+
+                // Page 8: Access security logs 
 
                 // Page 8: (no Option2 shown) fallthrough to default advance
                 default:
@@ -323,7 +342,7 @@ namespace Adventure_Game
                 }
                 else
                 {
-                    _player.TimeRemaining -= 1;
+                    _player.TimeRemaining -= 3;
                     _currentPage += 2;
                 }
             }
@@ -390,7 +409,6 @@ namespace Adventure_Game
         private async void DisplayPage()
         {
             _isWaitingForPause = true;
-
             btnOption1.Visible = btnOption2.Visible = btnOption3.Visible = false;
             btnOption1.Enabled = btnOption2.Enabled = btnOption3.Enabled = false;
             if (btnOpenGuessingForm != null)
@@ -404,15 +422,20 @@ namespace Adventure_Game
                 case 1:
                     lblNarrative.Text = "You wake up aboard the Aurora. You are alone. Click Continue.";
                     btnOption1.Text = "Continue";
+                    // Option1 = Continue to page 2 (prompt for name handled in btnOption1_Click)
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
                 // Page 2: Power allocation — three option buttons:
-                //   Option1 = Life Support (spend power, gain time)
-                //   Option2 = Communications (spend power, gain knowledge)
-                //   Option3 = Data Core (higher power cost, higher knowledge gain)
+                // Option1 = Life Support (spend power, gain time)
+                // Option2 = Communications (spend power, gain knowledge)
+                // Option3 = Data Core (higher power cost, higher knowledge gain)
                 case 2:
                     lblNarrative.Text = "Low Power Warning: choose where to divert power.";
+                    // Button labels correspond to handlers' switch(case 2) mapping:
+                    // btnOption1 triggers Life Support in btnOption1_Click
+                    // btnOption2 triggers Communications in btnOption2_Click
+                    // btnOption3 triggers Data Core in btnOption3_Click
                     btnOption1.Text = "Data Core";
                     btnOption2.Text = "Communications";
                     btnOption3.Text = "Life Support";
@@ -420,39 +443,45 @@ namespace Adventure_Game
                     btnOption1.Enabled = btnOption2.Enabled = btnOption3.Enabled = true;
                     break;
 
-                // Page 3: Corridor choices — two option buttons:               (DATA CORE CHOICE)
-                //   Option1 = Investigate (follow the sound to the challenge)
-                //   Option2 = Return to control room (go back to the hub)
+                // Page 3: Corridor choices — two option buttons:
+                // Option1 = Investigate (follow the sound to the challenge)
+                // Option2 = Return to control room (go back to the hub)
                 case 3:
                     lblNarrative.Text = "You move down the corridor. It is quiet...";
                     await Task.Delay(900);
                     lblNarrative.Text += "\nA strange sound echoes from the data core.";
+                    // btnOption1 maps to Investigate (btnOption1_Click -> case 3 sets _currentPage = 8)
+                    // btnOption2 maps to Return to control room (btnOption2_Click -> case 3 sets _currentPage = 2)
                     btnOption1.Text = "Investigate";
                     btnOption2.Text = "Return to control room";
                     btnOption1.Visible = btnOption2.Visible = true;
                     btnOption1.Enabled = btnOption2.Enabled = true;
                     break;
 
-                // Page 4: Incoming hail — two option buttons:                      (CONSOLE HAIL DECISION)
-                //   Option1 = Respond (accept contact; increases TrustAI/morality, costs time)
-                //   Option2 = Ignore  (decline contact; decreases morality, costs time)
+                // Page 4: Incoming hail — two option buttons:
+                // Option1 = Respond (accept contact; increases TrustAI/morality, costs time)
+                // Option2 = Ignore (decline contact; decreases morality, costs time)
                 case 4:
                     lblNarrative.Text = "You move down the corridor. An alarm is sounding...";
                     await Task.Delay(900);
                     lblNarrative.Text += "\nA hail sounds from the console.";
+                    // btnOption1 (Respond) handled in btnOption1_Click -> sets TrustAI true and navigates to page 6
+                    // btnOption2 (Ignore) handled in btnOption2_Click -> reduces morality and navigates to page 6
                     btnOption1.Text = "Respond (70% Chance)";
                     btnOption2.Text = "Ignore";
                     btnOption1.Visible = btnOption2.Visible = true;
                     btnOption1.Enabled = btnOption2.Enabled = true;
                     break;
 
-                // Page 5: Life Support Fix — two option buttons:            (POWER ALLOCATION RESULT)
-                //   Option1 = Repair systems (play skill/verification mini-game to repair; success restores Power/Time)
-                //   Option2 = Return to corridor (go back to corridor/hub)
+                // Page 5: Life Support Fix — two option buttons:
+                // Option1 = Repair systems (play skill/verification mini-game to repair; success restores Power/Time)
+                // Option2 = Return to corridor (go back to corridor/hub)
                 case 5:
                     lblNarrative.Text = "You divert power to life support. Systems are unstable but repairable.";
                     await Task.Delay(700);
                     lblNarrative.Text += "\nYou can attempt a manual verification/skill check to repair the systems.";
+                    // btnOption1 begins the repair mini-game (handled via OpenGuessingChallenge in btnOption1_Click)
+                    // btnOption2 returns to control room (handled in btnOption2_Click -> case 5 sets _currentPage = 2)
                     btnOption1.Text = "Attempt Repair (Skill)";
                     btnOption2.Text = "Return to control room";
                     btnOption1.Visible = btnOption2.Visible = true;
@@ -463,14 +492,18 @@ namespace Adventure_Game
                     lblNarrative.Text = "You continue down the corridor and spot an AI terminal.";
                     await Task.Delay(700);
                     lblNarrative.Text += "\nIt begins pulsing at your approach.";
+                    // Option1 = Continue deeper (btnOption1 leads to page 7 via btnOption1_Click case 6)
                     btnOption1.Text = "Continue";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
+
                 // Page 7: AI terminal — two option buttons:
-                //   Option1 = Activate AI (toggle trust, adjust morality/time)
-                //   Option2 = Leave it offline (decline activation, preserve status)
+                // Option1 = Activate AI (toggle trust, adjust morality/time)
+                // Option2 = Leave it offline (decline activation, preserve status)
                 case 7:
                     lblNarrative.Text = "You reach the AI terminal. Do you want to activate it?";
+                    // btnOption1 (Activate AI) handled in btnOption1_Click -> sets TrustAI true and navigates to page 10
+                    // btnOption2 (Leave offline) handled in btnOption2_Click -> keeps TrustAI false and navigates to page 2 (also sets _AIdone true)
                     btnOption1.Text = "Activate AI";
                     btnOption2.Text = "Leave it offline";
                     btnOption1.Visible = btnOption2.Visible = true;
@@ -478,64 +511,76 @@ namespace Adventure_Game
                     break;
 
                 // Page 8: Cryo pods — two option buttons:
-                //   Option1 = Search pods (chance to find survivor, costs time)
-                //   Option2 = Access security logs (gain information, costs time)
+                // Option1 = Search pods (chance to find survivor, costs time)
+                // Option2 = Access security logs (gain information, costs time)
                 case 8:
                     lblNarrative.Text = "You approach the cryo pods. What will you do?";
+                    // btnOption1 (Search pods) handled in btnOption1_Click -> case 8 performs RNG chance and sets SurvivorFound then goes to page 9
+                    // btnOption2 (Access logs) handled in btnOption2_Click -> not currently defined per-case 8 (falls through default)
                     btnOption1.Text = "Search pods";
                     btnOption2.Text = "Access security logs";
                     btnOption1.Visible = btnOption2.Visible = true;
                     btnOption1.Enabled = btnOption2.Enabled = true;
                     break;
 
-                // Page 9: Verification challenge entry — two controls:
-                //   Option1 = Begin Challenge (open guessing modal to resolve signal)
+                // Page 9: Verification challenge entry — controls:
+                // Option1 = Begin Challenge (open guessing modal to resolve signal)
                 case 9:
                     lblNarrative.Text = "You reach a terminal with encrypted data. You must verify the signal.";
                     await Task.Delay(700);
                     lblNarrative.Text += "\nInitiating verification challenge...";
+                    // Provide both a visible Begin Challenge button and an alternate dedicated button (btnOpenGuessingForm) if present
                     if (btnOpenGuessingForm != null)
                     {
                         btnOpenGuessingForm.Text = "Begin Challenge";
                         btnOpenGuessingForm.Visible = btnOpenGuessingForm.Enabled = true;
                     }
+                    // btnOption1 also begins the challenge (btnOption1_Click -> case 9 calls OpenGuessingChallenge)
                     btnOption1.Text = "Begin Challenge";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
                 case 10:
                     lblNarrative.Text = "You return to the control room. Systems are still unstable.";
+                    // Option1 = Try to stabilize power (btnOption1_Click -> case 10 increases Power and navigates to page 11)
                     btnOption1.Text = "Try to stabilize power";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
                 case 11:
                     lblNarrative.Text = "AI is now online. It begins analyzing the station's condition.";
+                    // Option1 = Continue to next AI dialog (btnOption1_Click -> case 11 keeps page 11 or advances in code path)
                     btnOption1.Text = "Continue";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
                 case 12:
                     lblNarrative.Text = "You continue your research and gain insight.";
+                    // Option1 = Continue research (btnOption1_Click -> case 12 keeps page 12)
                     btnOption1.Text = "Continue";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
                 case 13:
                     lblNarrative.Text = "Task Successful, the AI is managing the ship. What’s next?";
+                    // Option1 = Return to control room; Option2 = Go to escape pods
                     btnOption1.Text = "Return to control room";
                     btnOption2.Text = "Go to escape pods";
                     btnOption1.Visible = btnOption1.Enabled = true;
+                    // btnOption2 is shown but its handler must set the appropriate page when selected
                     break;
 
                 case 14:
                     lblNarrative.Text = "Life Support restored.";
+                    // Option1 = Continue after life support (btnOption1_Click -> case 14 sets next page)
                     btnOption1.Text = "Continue";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
                 case 15:
                     lblNarrative.Text = "You find your own empty pod. The station is deserted.";
+                    // Option1 = Continue searching (btnOption1_Click -> case 15 navigates to page 16)
+                    // Option2 = Return to control room (btnOption2_Click -> case 15 should navigate to page 2)
                     btnOption1.Text = "Continue searching";
                     btnOption2.Text = "Return to control room";
                     btnOption1.Visible = btnOption2.Visible = true;
@@ -544,19 +589,23 @@ namespace Adventure_Game
 
                 case 16:
                     lblNarrative.Text = "You spot a data stick on the floor by an exit...";
+                    // Option1 = Continue (btnOption1_Click -> case 16 navigates forward)
                     btnOption1.Text = "Continue";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
                 case 17:
                     lblNarrative.Text = "You return to the control room, power is temporarily stable.";
+                    // Option1 = Continue; Option2 = Check Data Core (btnOption2 should route to data core page)
                     btnOption1.Text = "Continue";
                     btnOption2.Text = "Check Data Core";
                     btnOption1.Visible = btnOption2.Visible = true;
                     btnOption1.Enabled = btnOption2.Enabled = true;
                     break;
+
                 default:
                     lblNarrative.Text = "End of demo path. Use Restart to try again.";
+                    // Default shows Restart on Option1; pressing it sets _restarting true so btnOption1_Click resets the player
                     btnOption1.Text = "Restart";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     _restarting = true;
