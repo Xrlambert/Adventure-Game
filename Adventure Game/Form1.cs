@@ -2,6 +2,8 @@
 using System.Media;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Timers;
+using System.Threading;
 
 
 namespace Adventure_Game
@@ -26,14 +28,18 @@ namespace Adventure_Game
         {
             public string Name = "Player";
             public int Power = 100;
-            public int TimeRemaining = 60;
+            public int TimeRemaining;
+            public int difficulty;
             public int Morality = 0;
             public int Knowledge = 0;
             public bool TrustAI = false;
             public bool SurvivorFound = false;
         }
 
-        
+        // --- Timer for Time element --------------------------------------------------
+
+        private System.Windows.Forms.Timer _gameTimer;
+
         // Active player instance
         private Player _player = new Player();
 
@@ -51,9 +57,11 @@ namespace Adventure_Game
             MXB.Visible = true;*/
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Timer_Tick(object sender, EventArgs e)
         {
-            //Sound.Starty
+            _gameTimer = new System.Windows.Forms.Timer();
+            _gameTimer.Interval = 5000;
+            _gameTimer.Tick += Timer_Tick;
         }
 
         // --- Option 1 handler ------------------------------------------------------
@@ -388,6 +396,7 @@ namespace Adventure_Game
             }
 
             return input;
+
         }
 
         // --- Status label update ---------------------------------------------------
