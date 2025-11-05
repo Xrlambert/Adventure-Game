@@ -21,15 +21,16 @@ namespace Adventure_Game
         private bool _AIdone = false;
         private bool _repairDone = false;
         private bool _dataCoreAccessed = false;
+        private bool lifeSupportComp = false;
 
 
         // --- Simple player model ---------------------------------------------------- 
-        private class Player
+        public class Player
         {
             public string Name = "Player";
             public int Power = 100;
-            public int TimeRemaining;
-            public int difficulty;
+            public int TimeRemaining = 45;
+            public int difficulty = -1;
             public int Morality = 0;
             public int Knowledge = 0;
             public bool TrustAI = false;
@@ -49,7 +50,6 @@ namespace Adventure_Game
             InitializeComponent();
             UpdateStatusLabel();  // Shows initial player stats
             DisplayPage();        // Loads the first scene
-            //this.Shown += Form1_Load;
 
             /*MXB.URL = @"slow-down-244244";
             MXB.settings.playCount = 9999;
@@ -57,17 +57,13 @@ namespace Adventure_Game
             MXB.Visible = true;*/
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            _gameTimer = new System.Windows.Forms.Timer();
-            _gameTimer.Interval = 5000;
-            _gameTimer.Tick += Timer_Tick;
-        }
+
 
         // --- Option 1 handler ------------------------------------------------------
         private async void btnOption1_Click(object sender, EventArgs e)
         {
             if (_isWaitingForPause) return;
+            _rng.Next(1, 101);
 
             //Sound.();
             // If we're on the Restart prompt, Option1 restarts the game
@@ -86,7 +82,7 @@ namespace Adventure_Game
             {
                 // Page 1: Continue -> go to page 2
                 case 1:
-                    string name = PromptForName();
+                    string name = PromptForName();/*_player*/
                     if (!string.IsNullOrWhiteSpace(name)) _player.Name = name;
                     _currentPage = 2;
                     break;
@@ -94,7 +90,7 @@ namespace Adventure_Game
                 // Page 2: Life Support
                 case 2:
                     _player.Power -= 5;
-                    _player.TimeRemaining += 10;
+                    _player.TimeRemaining += 2;
                     _currentPage = 3;
                     break;
 
@@ -105,10 +101,16 @@ namespace Adventure_Game
 
                 // Page 4: Respond -> accept contact, trust AI path -> go to AI terminal (page 6)
                 case 4:
-                    _player.TrustAI = true;
-                    _player.Morality += 1;
+                    _player.Knowledge += 2;
                     _player.TimeRemaining -= 1;
-                    _currentPage = 6;
+                    if (_rng.Next(100) < 70)
+                    {
+                        _currentPage = 18;
+                    }
+                    else
+                    {
+                        _currentPage = 19;
+                    }
                     break;
 
                 // Page 5: Attempt Repair via skill game (opens modal, return early)
@@ -149,7 +151,7 @@ namespace Adventure_Game
                 case 10:
                     _player.Power += 5;
                     _player.TimeRemaining -= 1;
-                    _currentPage = 11;
+                    _currentPage = 2;
                     break;
 
                 // Page 11: Continue -> page 11
@@ -223,7 +225,7 @@ namespace Adventure_Game
                 case 4:
                     _player.Morality -= 1;
                     _player.TimeRemaining -= 1;
-                    _currentPage = 6;
+                    _currentPage = 10;
                     break;
 
                 // Page 5: Return to control room
@@ -272,6 +274,7 @@ namespace Adventure_Game
                     _player.Power -= 10;
                     _player.Knowledge += 2;
                     _currentPage = 5;
+                    lifeSupportComp = true;
                     break;
 
                 // Other pages: not used, just advance
@@ -366,28 +369,61 @@ namespace Adventure_Game
         }
 
         // --- Name prompt -----------------------------------------------------------
-        private string PromptForName()
+        private string PromptForName()  /*Player player*/
         {
             string input = null;
+            int selectedStartTime = -1;
+            int selectedDifficultyId = -1;
 
             using (var prompt = new Form())
             {
                 prompt.FormBorderStyle = FormBorderStyle.FixedDialog;
                 prompt.StartPosition = FormStartPosition.CenterParent;
                 prompt.Width = 420;
-                prompt.Height = 150;
-                prompt.Text = "Enter your name";
+                prompt.Height = 190;
+                prompt.Text = "Enter your name and choose difficulty";
 
                 var lbl = new Label() { Left = 12, Top = 12, Text = "Name:", Width = 380 };
                 var txt = new TextBox() { Left = 12, Top = 36, Width = 380 };
-                var ok = new Button() { Text = "OK", Left = 220, Width = 75, Top = 68, DialogResult = DialogResult.OK };
-                var cancel = new Button() { Text = "Cancel", Left = 305, Width = 75, Top = 68, DialogResult = DialogResult.Cancel };
+
+                var btnEasy = new Button() { Text = "Easy (50s)", Left = 12, Width = 110, Top = 72 };
+                var btnMedium = new Button() { Text = "Medium (45s)", Left = 132, Width = 110, Top = 72 };
+                var btnHard = new Button() { Text = "Hard (30s)", Left = 252, Width = 110, Top = 72 };
+
+                var ok = new Button() { Text = "OK", Left = 220, Width = 75, Top = 112, DialogResult = DialogResult.OK };
+                var cancel = new Button() { Text = "Cancel", Left = 305, Width = 75, Top = 112, DialogResult = DialogResult.Cancel };
+
+                // Difficulty click handlers: record selection, then close with OK
+                btnEasy.Click += (s, e) =>
+                {
+                    selectedStartTime = 50;
+                    selectedDifficultyId = 0;
+                    prompt.DialogResult = DialogResult.OK;
+                    prompt.Close();
+                };
+                btnMedium.Click += (s, e) =>
+                {
+                    selectedStartTime = 45;
+                    selectedDifficultyId = 1;
+                    prompt.DialogResult = DialogResult.OK;
+                    prompt.Close();
+                };
+                btnHard.Click += (s, e) =>
+                {
+                    selectedStartTime = 30;
+                    selectedDifficultyId = 2;
+                    prompt.DialogResult = DialogResult.OK;
+                    prompt.Close();
+                };
 
                 prompt.AcceptButton = ok;
                 prompt.CancelButton = cancel;
 
                 prompt.Controls.Add(lbl);
                 prompt.Controls.Add(txt);
+                prompt.Controls.Add(btnEasy);
+                prompt.Controls.Add(btnMedium);
+                prompt.Controls.Add(btnHard);
                 prompt.Controls.Add(ok);
                 prompt.Controls.Add(cancel);
 
@@ -395,9 +431,43 @@ namespace Adventure_Game
                     input = txt.Text;
             }
 
-            return input;
+            // If a difficulty was chosen, record it on the form-level state and assign player's TimeRemaining
+            if (selectedStartTime != -1)
+            {
+                // 
+                try
+                {
+                    _player.TimeRemaining = selectedStartTime;
+                }
+                catch
+                {
+                    // ignore reflection errors; these assignments are optional depending on your surrounding class
+                }
 
+                // If you have a _player instance with a TimeRemaining property, set it here.
+                try
+                {
+                    var playerField = this.GetType().GetField("_player", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (playerField != null)
+                    {
+                        var player = playerField.GetValue(this);
+                        if (player != null)
+                        {
+                            var timeProp = player.GetType().GetProperty("TimeRemaining");
+                            if (timeProp != null && timeProp.CanWrite)
+                                timeProp.SetValue(player, selectedStartTime);
+                        }
+                    }
+                }
+                catch
+                {
+                    // ignore if _player or TimeRemaining are not present
+                }
+            }
+            Timer_Tick(null, null); // Start the timer
+            return input;
         }
+
 
         // --- Status label update ---------------------------------------------------
         private async void UpdateStatusLabel()
@@ -409,10 +479,37 @@ namespace Adventure_Game
             if (pageLbl != null)
                 pageLbl.Text = $"Page: {_currentPage}";
 
-            lblStatus.ForeColor = System.Drawing.Color.Yellow;
-            await Task.Delay(500);
-            lblStatus.ForeColor = System.Drawing.Color.Black;
+            /*lblStatus.ForeColor = System.Drawing.Color.Red;
+            await Task.Delay(250);
+            lblStatus.ForeColor = System.Drawing.Color.Black;*/
         }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            // initialize the timer the first time this runs
+            if (_gameTimer == null)
+            {
+                _gameTimer = new System.Windows.Forms.Timer();
+                _gameTimer.Interval = 3000; // 3 seconds
+                _gameTimer.Tick += Timer_Tick;
+                _gameTimer.Start();
+                return;
+            }
+
+            // on each tick, decrement player's remaining time
+            if (_player != null)
+            {
+                _player.TimeRemaining = Math.Max(0, _player.TimeRemaining - 1);
+
+                // optional: react to time running out
+                if (_player.TimeRemaining == 0)
+                {
+                    _currentPage = 25; ; // force to end state
+                }
+            }
+            UpdateStatusLabel();
+        }
+
 
         // --- DisplayPage method -----------------------------------------------------
         private async void DisplayPage()
@@ -440,14 +537,22 @@ namespace Adventure_Game
                 // Option2 = Communications (spend power, gain knowledge)
                 // Option3 = Data Core (higher power cost, higher knowledge gain)
                 case 2:
+                    if (!lifeSupportComp) { 
                     lblNarrative.Text = "Low Power Warning: choose where to divert power.";
+                    } else
+                    {
+                        lblNarrative.Text = "Continue Exploration";
+                    }
                     // Button labels correspond to handlers' switch(case 2) mapping:
                     // btnOption1 triggers Life Support in btnOption1_Click
                     // btnOption2 triggers Communications in btnOption2_Click
                     // btnOption3 triggers Data Core in btnOption3_Click
                     btnOption1.Text = "Data Core";
                     btnOption2.Text = "Communications";
-                    btnOption3.Text = "Life Support";
+                    if (lifeSupportComp)
+                        btnOption3.Text = "Corridor";
+                    else
+                        btnOption3.Text = "Life Support";
                     btnOption1.Visible = btnOption2.Visible = btnOption3.Visible = true;
                     btnOption1.Enabled = btnOption2.Enabled = btnOption3.Enabled = true;
                     break;
@@ -552,7 +657,7 @@ namespace Adventure_Game
                 case 10:
                     lblNarrative.Text = "You return to the control room. Systems are still unstable.";
                     // Option1 = Try to stabilize power (btnOption1_Click -> case 10 increases Power and navigates to page 11)
-                    btnOption1.Text = "Try to stabilize power";
+                    btnOption1.Text = "Continue";
                     btnOption1.Visible = btnOption1.Enabled = true;
                     break;
 
@@ -610,6 +715,13 @@ namespace Adventure_Game
                     btnOption2.Text = "Check Data Core";
                     btnOption1.Visible = btnOption2.Visible = true;
                     btnOption1.Enabled = btnOption2.Enabled = true;
+                    break;
+
+                case 25:
+                    lblNarrative.Text = "The ship begins to rumble and you feel a sense of weightlessness";
+                    await Task.Delay(900);
+                    lblNarrative.Text += "\n Through the veiwport, you see a massive ship looming over you.";
+                    btnOption1.Text = "Continue";
                     break;
 
                 default:
